@@ -1,19 +1,33 @@
 <?php  
+namespace App\Database;
 
-// here the connection of db with the sql server
-$serverName ="RITIK-1234\\SQLEXPRESS";
-$connectionData =[
-    "Database"=> "MarkbookTracker",
-    "Uid"=>"sa",
-    "PWD"=>"work123@#$"
-];
-$connection = sqlsrv_connect($serverName, $connectionData);
-if (!$connection) {
-    die("❌ Connection failed: " . print_r(sqlsrv_errors(), true));
-} else {
-    echo "✅ Connected to MS SQL Server!";
+use PDO;
+use PDOException;
+
+class Database {
+    private static $instance=null;
+    private $db;
+    private function __construct() {
+        $serverName = "RITIK-1234\\SQLEXPRESS";
+        $dbName = "MarkbookTracker";
+        $dbUser = "sa";
+        $dbPassword = "work123@#$";
+        try {
+            //code...
+            $this->db = new PDO("sqlsrv:Server=$serverName;Database=$dbName", $dbUser, $dbPassword);
+            $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            echo"connected succesfuly";
+        } catch (PDOException $th) {
+            echo "Connection failed". $th->getMessage();
+            //throw $th;
+        }
+    }
+    public static function getInstance() {
+            if(!self::$instance){
+                self::$instance = new Database();
+            }
+            return self::$instance->db;
+    }
+
 }
 
-
-
-?>
